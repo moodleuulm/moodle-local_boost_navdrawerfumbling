@@ -121,6 +121,7 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
         $nodetitle = null;
         $nodevisible = false;
         $nodeischild = false;
+        $nodetreelevel = 1;
         $nodekey = null;
         $nodelanguage = null;
         $nodeicon = null;
@@ -144,7 +145,19 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                         // Check for the mandatory first param: title.
                         case 0:
                             // Check if this is a child node and get the node title.
-                            if (substr($setting, 0, 1) == '-') {
+                            if (substr($setting, 0, 4) == '----') {
+                                $nodeischild = true;
+                                $nodetreelevel = 4;
+                                $nodetitle = local_boostnavigation_build_node_title(substr($setting, 4));
+                            } else if (substr($setting, 0, 3) == '---') {
+                                $nodeischild = true;
+                                $nodetreelevel = 3;
+                                $nodetitle = local_boostnavigation_build_node_title(substr($setting, 3));
+                            } else if (substr($setting, 0, 2) == '--') {
+                                $nodeischild = true;
+                                $nodetreelevel = 2;
+                                $nodetitle = local_boostnavigation_build_node_title(substr($setting, 2));
+                            } else if (substr($setting, 0, 1) == '-') {
                                 $nodeischild = true;
                                 $nodetitle = local_boostnavigation_build_node_title(substr($setting, 1));
                             } else {
@@ -447,7 +460,14 @@ function local_boostnavigation_build_custom_nodes($customnodes, navigation_node 
                 if ($nodeicon instanceof pix_icon) {
                     $customnode->icon = $nodeicon;
                 } else {
-                    $customnode->icon = new pix_icon('customnodexxs', '', 'local_boostnavigation');
+                    switch($nodetreelevel) {
+                        case $nodetreelevel > 1:
+                            $customnode->add_class('localboostnavigationcustom_level_' . $nodetreelevel);
+                            $customnode->icon = new pix_icon('customnodexxs', '', 'local_boostnavigation');
+                            break;
+                        default:
+                            $customnode->icon = new pix_icon('customnodexxs', '', 'local_boostnavigation');
+                    }
                 }
             }
         }
